@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <stdlib.h>
 // RecordType
 struct RecordType
 {
@@ -11,13 +11,13 @@ struct RecordType
 // Fill out this structure
 struct HashType
 {
-
+ struct RecordType *pData;
 };
 
 // Compute the hash function
 int hash(int x)
 {
-
+    return x % 10;
 }
 
 // parses input file to an integer array
@@ -75,13 +75,24 @@ void printRecords(struct RecordType pData[], int dataSz)
 // index x -> id, name, order -> id, name, order ....
 void displayRecordsInHash(struct HashType *pHashArray, int hashSz)
 {
-	int i;
+    int i, j;
 
-	for (i=0;i<hashSz;++i)
-	{
-		// if index is occupied with any records, print all
-	}
+    for (i = 0; i < hashSz; i++)
+    {
+        if (pHashArray[i].pData != NULL)
+        {
+            printf("Index %d:", i);
+            for (j = 0; pHashArray[i].pData[j].id != -1 && j < 10; j++)
+            {
+                printf(" -> %d, %c, %d", pHashArray[i].pData[j].id, pHashArray[i].pData[j].name, pHashArray[i].pData[j].order);
+            }
+            printf("\n");
+        }
+    }
 }
+
+
+
 
 int main(void)
 {
@@ -91,4 +102,53 @@ int main(void)
 	recordSz = parseData("input.txt", &pRecords);
 	printRecords(pRecords, recordSz);
 	// Your hash implementation
+    int hashSize = 10;
+    struct HashType *pHashArray = malloc(hashSize * sizeof(struct HashType));
+    if (pHashArray == NULL)
+    {
+        fprintf(stderr, "Insufficient memory to create hash");
+        return -1;
+    }
+
+    int i, loc;
+    for (i=0; i<hashSize; ++i)
+    {
+        pHashArray[i].pData = NULL;
+    }
+
+    for (i=0; i<recordSz; ++i)
+    {
+        loc = hash(pRecords[i].id);
+        if(pHashArray[loc].pData == NULL)
+        {
+            pHashArray[loc].pData = malloc((recordSz+1) * sizeof(struct RecordType));
+            pHashArray[loc].pData[0].id = 0;
+        }
+
+
+    int j = 0;
+    while(pHashArray[loc].pData[j].id != 0)
+    {
+        ++j;
+
+    }
+    pHashArray[loc].pData[j].id = pRecords[i].id;
+    pHashArray[loc].pData[j].name = pRecords[i].name;
+    pHashArray[loc].pData[j].order = pRecords[i].order;
+}
+
+
+displayRecordsInHash(hashArray, hashSz);
+
+// free memory
+for (i = 0; i < hashSz; ++i)
+{
+    if (hashArray[i].pData != NULL)
+    {
+        free(hashArray[i].pData);
+    }
+}
+free(pData);
+  return 0;
+
 }
